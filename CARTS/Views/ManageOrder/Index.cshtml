@@ -1,0 +1,89 @@
+﻿@*@model IEnumerable<CARTS.Models.Order>*@
+@using PagedList;
+@using PagedList.Mvc;
+@model CARTS.Models.ViewModel.OrderListViewModels
+
+@{
+    ViewBag.Title = "Index";
+    Layout = "~/Views/Shared/_Layout.cshtml";
+
+}
+
+<h2>訂單列表</h2>
+
+@*@using (Html.BeginForm("SerachByUserName", "ManageOrder"))
+    {
+        @Html.TextBox("UserName", null, new { @class = "btn-info" })
+        <input type="submit" value="搜尋" class="btn btn-default" />
+    }*@
+
+@using (Html.BeginForm("Index", "ManageOrder", FormMethod.Post, new { @class = "form-horizontal", role = "form", id = "OrderList" }))
+{
+    @Html.EditorFor(x => x.SearchParameter.UserID, new { htmlAttributes = new { @class = "btn-info" } })
+    <input type="submit" value="搜尋" class="btn btn-default" />
+    
+}
+
+<table class="table">
+    <tr>
+        <th>購買會員</th>
+        <th>收貨人姓名</th>
+        <th>收貨人電話</th>
+        <th>收貨人住址</th>
+        <th></th>
+    </tr>
+    @foreach (var item in Model.Orders)
+    {
+        <tr>
+            <td>
+                @item.GetUrderName()
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RecieverName)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RecieverPhone)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.RecieverAddress)
+            </td>
+            <td>
+                @Html.ActionLink("商品明細", "Details", new { id = item.Id }
+   , new { @class = "btn btn-default" })
+            </td>
+        </tr>
+    }
+</table>
+
+@Html.PagedListPager(Model.Orders, page => Url.Action("Index", new { page }), PagedListRenderOptions.Classic)
+
+
+<script type="text/javascript">
+
+    $(function () {
+        $('.pagination>li>a[href]').each(function (i, item) {
+            console.log(i)
+            console.log(item)
+            var page = $(item).attr('href').replace('/ManageOrder?page=', '');
+            $(item).attr('href', '#').click(function () { postPage(page); });
+
+        });
+    });
+
+    function postPage(page) {
+        console.log(page)
+        var targetFormId = '#OrderList';
+        console.log(targetFormId)
+        if ($(targetFormId).length > 0) {
+
+            $('<input>')
+                .attr({ type: 'hidden', id: 'PageIndex', name: 'PageIndex', value: page })
+                .appendTo($(targetFormId));
+            $(targetFormId).submit();
+        }
+    };
+</script>
+
+
+
+
